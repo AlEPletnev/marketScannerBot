@@ -1,13 +1,10 @@
 package com.sacrypto.test;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sacrypto.grindmoneybot.service.exchangeClient.ByBit.ResponseEntity.Assets.ByBitListAssets;
-import com.sacrypto.grindmoneybot.service.exchangeClient.ByBit.ResponseEntity.Assets.TokenSymbols;
+import com.sacrypto.marketScannerBot.service.exchangeClient.ByBit.ResponseEntity.Assets.ByBitListAssets;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Test {
 

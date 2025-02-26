@@ -1,13 +1,13 @@
 package com.sacrypto.marketScannerBot;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GrindmoneybotApplicationTests {
+public class ApplicationTest {
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    public void contextLoads(){
 
+    }
 }

@@ -1,7 +1,12 @@
 package com.sacrypto.marketScannerBot.service;
 
 import com.sacrypto.marketScannerBot.config.BotConfig;
+import com.sacrypto.marketScannerBot.data.AssetStorage;
+import com.sacrypto.marketScannerBot.data.ChatIdStorage;
+import com.sacrypto.marketScannerBot.service.CommandsStorage.CommandStorage;
+import com.sacrypto.marketScannerBot.service.CommandsStorage.Commands.Command;
 import com.sacrypto.marketScannerBot.service.ScanerMarket.ScannerMarket;
+import com.sacrypto.marketScannerBot.service.ScanerMarket.handlers.CandlesHandler;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -19,9 +24,10 @@ public class BotController extends TelegramLongPollingBot {
     private BotConfig config;
 
     @Autowired
-    private ScannerMarket scanner;
+    private CommandStorage commandStorage;
 
-    private volatile long chatId;
+    @Autowired
+    private ChatIdStorage chatId;
 
     @Override
     public String getBotUsername() {
@@ -57,26 +63,15 @@ public class BotController extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update){
         if(update.hasMessage() && update.getMessage().hasText()){
-            long chatId = update.getMessage().getChatId();
-            String messageText = update.getMessage().getText();
-            switch(messageText){
-                case "/start":
-                    scanner.enableScanning(chatId);
-                    break;
-                case "/echo":
-                    sendMessage(chatId,messageText);
-                    break;
-                case "/stop":
-                    scanner.disableScanning();
-                    break;
-                case "/test":
-                    String message = "test echo";
-                    sendMessage(chatId,message);
-                    break;
-                default:
-                    sendMessage(chatId, "Command not received");
-                    break;
+            this.chatId.setChatId(update.getMessage().getChatId());
+            String textCommand = update.getMessage().getText();
+            String responseMessage = "Command not received";
+            for(Command currentCommand : this.commandStorage.getCommandsList()){
+                if(currentCommand.isExecuteCommand(textCommand)){
+                    responseMessage = currentCommand.processCommand();
+                }
             }
+            sendMessage(this.chatId.getChatId(),responseMessage);
         }
     }
 

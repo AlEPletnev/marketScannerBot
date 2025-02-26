@@ -2,6 +2,8 @@ package com.sacrypto.marketScannerBot.service.ScanerMarket;
 
 import com.sacrypto.marketScannerBot.data.AssetStorage;
 import com.sacrypto.marketScannerBot.service.ScanerMarket.TelegramScanerSendler.TelegramScannerSender;
+import com.sacrypto.marketScannerBot.service.ScanerMarket.handlers.CandlesHandler;
+import com.sacrypto.marketScannerBot.service.exchangeClient.ByBit.EnumForRequest.ByBitInterval;
 import com.sacrypto.marketScannerBot.service.multithreading.TasksGenerator;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static com.sacrypto.marketScannerBot.service.exchangeClient.ByBit.EnumForRequest.ByBitInterval.THREE_MINUTE;
 
 
 @Component
@@ -34,6 +38,9 @@ public class ScannerMarket extends Thread{
 
     private ExecutorService assetHandler;
 
+    @Autowired
+    private CandlesHandler candlesHandler;
+
     public ScannerMarket(){
         this.assetHandler = Executors.newFixedThreadPool(100);
     }
@@ -42,22 +49,6 @@ public class ScannerMarket extends Thread{
     private void init(){
         this.start();
     }
-
-//    @Override
-//    public void run(){
-//        while(true){
-//            if(isScanning){
-//                try {
-//                    Thread.sleep(1000);
-//                } catch (InterruptedException e) {
-//                    throw new RuntimeException(e);
-//                }
-//                telegramScannerSender.sendMessage(chatId,"testThread!!!");
-//            } else {
-//
-//            }
-//        }
-//    }
 
     public void enableScanning(long chatId){
         this.chatId = chatId;
@@ -76,6 +67,11 @@ public class ScannerMarket extends Thread{
                 List<Future<String>> list = new ArrayList<>(assetStorage.getListAssetStorage().size());
                 for(String nameAsset : assetStorage.getListAssetStorage()){
                     list.add(assetHandler.submit(tasksGenerator.createTask(nameAsset)));
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
                 System.out.println("Отправили в обработку все!!!");
 
@@ -106,35 +102,4 @@ public class ScannerMarket extends Thread{
         }
     }
 
-//    @Override
-//    public void run(){
-//        while(true){
-//            if(isScanning){
-//                List<Future<String>> list = new ArrayList<>(600);
-//                for(String nameAsset : assetStorage.getListAssetStorage()){
-//                    list.add(executor.submit(tasksGenerator.createTask(nameAsset)));
-//                }
-//
-//                List<String> sendMessageList = new ArrayList<>(600);
-//                for(Future<String> result : list){
-//                    try {
-//                        String message = result.get();
-//                        if(message.equals("nothing")){
-//                            sendMessageList.add(message);
-//                        }
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    } catch (ExecutionException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//                if (sendMessageList.isEmpty() != false){
-//                    /// допиши все на свежую голову
-//                }
-//
-//            } else {
-//
-//            }
-//        }
-//    }
 }

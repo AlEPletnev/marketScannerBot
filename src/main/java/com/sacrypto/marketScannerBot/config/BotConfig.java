@@ -1,18 +1,17 @@
 package com.sacrypto.marketScannerBot.config;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import lombok.Getter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Configuration
-@ConfigurationProperties(prefix = "telegrambot")
-@PropertySource("application.properties")
-@Data
+@Component
+@Getter
 public class BotConfig {
 
+    @Value("${telegrambot.name}")
     private String name;
 
+    @Value("${telegrambot.token}")
     private String token;
 
 }
